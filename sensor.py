@@ -38,6 +38,27 @@ class Sensor():
 
         return(endPoint)
 
+    def get_min_max(self):
+        
+        origin = self.car.get_origin()
+
+        start_X = origin[0] + self.start[0]*np.cos(np.deg2rad(self.car.angle)) + self.start[1]*np.sin(np.deg2rad(self.car.angle)) 
+        start_Y = origin[1] - self.start[0]*np.sin(np.deg2rad(self.car.angle)) + self.start[1]*np.cos(np.deg2rad(self.car.angle)) 
+
+ 
+        end_X = origin[0] + self.end[0]*np.cos(np.deg2rad(self.car.angle)) + self.end[1]*np.sin(np.deg2rad(self.car.angle)) 
+        end_Y = origin[1] - self.end[0]*np.sin(np.deg2rad(self.car.angle)) + self.end[1]*np.cos(np.deg2rad(self.car.angle)) 
+        
+        
+        min_X = int(min([start_X, end_X]))
+        min_Y = int(min([start_Y, end_Y]))
+
+        max_X = int(max([start_X, end_X]))
+        max_Y = int(max([start_Y, end_Y]))
+
+        return([(int(start_X), int(start_Y)), (int(end_X), int(end_Y))])
+
+
     def update(self):
         self.color = self.red if self.detect else self.green
         pg.draw.line(self.car, self.color, self.start, self.end, 2) 

@@ -85,25 +85,28 @@ def main():
 
        
         # Checking for collisions
-        for corner in rect.get_corners():
+        for corner in rect.get_min_max():
             pg.draw.circle(screen, blue, corner , 5)
 
-            for obs in obs_lst:
-                if obs.in_wall(corner):
-                    rect.reset() 
+        for obs in obs_lst:
+            if obs.in_wall_min_max(rect.get_min_max()):
+                rect.reset() 
 
         # pg.draw.circle(screen, (255, 0, 0), rect.get_origin(), 5)
 
         for sen in rect.sensors:
-            point = sen.get_end()
-
+            point = sen.get_min_max()
+            
+            pg.draw.circle(screen, (255, 0, 255, 0), point[1], 5)
 #            for obs in obs_lst: 
 #                color = (255, 0, 0) if obs.in_wall(point) else (255, 255, 0)
 #                pg.draw.circle(screen,  color, point, 5)
 
             for obs in obs_lst:
-                if obs.in_wall(point): 
-                    pg.draw.circle(screen, (255, 0, 0), point, 5)
+                if obs.in_wall_min_max2(sen.get_min_max()): 
+                    pg.draw.circle(screen, (255, 0, 0), point[0], 5)
+                else:
+                    pg.draw.circle(screen, (255, 255, 0, 0), point[0], 5)
 
         # 3. copy/redraw the rectangle
         rect.update()

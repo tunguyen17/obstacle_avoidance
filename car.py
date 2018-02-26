@@ -50,7 +50,7 @@ class Car(pg.Surface):
         sensor4 = sensor.Sensor(self, (int(0.51*width), center_y + self.carHeight), -80, self.green) 
         sensor5 = sensor.Sensor(self, (int(0.51*width), center_y ), 80, self.green) 
 
-        self.sensors = [sensor1]#, sensor2, sensor3, sensor4, sensor5] 
+        self.sensors = [sensor1, sensor2, sensor3, sensor4, sensor5] 
 
 #        for sen in self.sensors:
 #            sen.update()

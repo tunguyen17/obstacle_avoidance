@@ -68,10 +68,10 @@ def main():
         screen.fill(BG_COLOR)
 
         # 2. Draw rect
-        #obs_1 = wall.Wall(screen,  blue, (0, 0, max_x, 50))
-        #obs_2 = wall.Wall(screen,  blue, (0, 0, 50, max_y))
-        #obs_3 = wall.Wall(screen,  blue, (max_x-50, 0, max_x, max_y))
-        #obs_4 = wall.Wall(screen,  blue, (0, max_y-50, max_x, max_y))
+        obs_1 = wall.Wall(screen,  blue, (0, 0, max_x, 50))
+        obs_2 = wall.Wall(screen,  blue, (0, 0, 50, max_y))
+        obs_3 = wall.Wall(screen,  blue, (max_x-50, 0, max_x, max_y))
+        obs_4 = wall.Wall(screen,  blue, (0, max_y-50, max_x, max_y))
         
         obs_5 = wall.Wall(screen,  blue, (50, 50, 150, 250))
         obs_6 = wall.Wall(screen,  blue, (400, 200, 410, 220))
@@ -79,7 +79,7 @@ def main():
         #obs_8 = wall.Wall(screen,  blue, (0, max_y-50, max_x, max_y))
         #obs_9 = wall.Wall(screen,  blue, (0, max_y-50, max_x, max_y))
 
-        obs_lst = [obs_5]#, obs_6]
+        obs_lst = [obs_1, obs_2, obs_3, obs_4, obs_5, obs_6]
 
 #        print(rect.xpos, ",  ", rect.ypos)
 
@@ -91,16 +91,18 @@ def main():
             for obs in obs_lst:
                 if obs.in_wall(corner):
                     rect.reset() 
-                    break
 
         # pg.draw.circle(screen, (255, 0, 0), rect.get_origin(), 5)
 
         for sen in rect.sensors:
             point = sen.get_end()
-            pg.draw.circle(screen, (255, 255, 0), point, 5)
+
+#            for obs in obs_lst: 
+#                color = (255, 0, 0) if obs.in_wall(point) else (255, 255, 0)
+#                pg.draw.circle(screen,  color, point, 5)
+
             for obs in obs_lst:
-                sen.detect = obs.in_wall(point)
-                if sen.detect:
+                if obs.in_wall(point): 
                     pg.draw.circle(screen, (255, 0, 0), point, 5)
 
         # 3. copy/redraw the rectangle

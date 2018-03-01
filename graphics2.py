@@ -30,7 +30,7 @@ def main():
     yellow = (255, 255, 0)
 
     # draw rect
-    rect = car.Car(screen, 300, 300, 300, 200) 
+    rect = car.Car(screen, 200, 500, 300, 200) 
     rect.rotate(0)
     
     # num sensor
@@ -71,13 +71,15 @@ def main():
         
         screen.fill(BG_COLOR)
 
+        rect.move(1)
+
         # 2. Draw rect
         obs_1 = wall.Wall(screen,  blue, (0,   0, max_x, 10))
         obs_2 = wall.Wall(screen,  blue, (0, 0, 10, max_y))
         obs_3 = wall.Wall(screen,  blue, (max_x-10, 0, max_x, max_y))
         obs_4 = wall.Wall(screen,  blue, (0, max_y-10, max_x, max_y))
         
-        obs_5 = wall.Wall(screen,  blue, (50, 50, 150, 250))
+        obs_5 = wall.Wall(screen,  blue, (100, 100, 150, 250))
         obs_6 = wall.Wall(screen,  blue, (400, 200, 410, 220))
         #obs_7 = wall.Wall(screen,  blue, (0, max_y-50, max_x, max_y))
         #obs_8 = wall.Wall(screen,  blue, (0, max_y-50, max_x, max_y))
@@ -115,7 +117,7 @@ def main():
         # Update display
         pg.display.flip()
         
-        clock.tick(30)
+        clock.tick(45)
 
 if __name__ == "__main__":
     main()

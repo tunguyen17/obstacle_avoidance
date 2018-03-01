@@ -3,7 +3,7 @@ import numpy as np
 import sensor 
 
 class Car(pg.Surface):
-    def __init__(self, parent, xpos, ypos, width, height, delta = 10, step = 10):
+    def __init__(self, parent, xpos, ypos, width, height, angle = 1, delta = 18, step = 5):
         '''
             parent = screen
         '''
@@ -18,8 +18,17 @@ class Car(pg.Surface):
         # Store the information
         self.xpos = xpos
         self.ypos = ypos
+        
+        # Saving original position
+        self.xpos0 = xpos
+        self.ypos0 = ypos
+
         self.parent = parent
-        self.angle = 0
+        
+        self.angle = angle
+
+        self.angle0 = angle
+
         self.delta = delta # angle
         self.step = step # position
         
@@ -90,9 +99,10 @@ class Car(pg.Surface):
     
     def reset(self):
         # update the center
-        self.xpos = 300
-        self.ypos = 200
-        self.rect.center = (300, 200)
+        self.xpos = self.xpos0 
+        self.ypos = self.ypos0
+        self.angle = self.angle0
+        self.rect.center = (self.xpos, self.ypos)
 
     def get_corners(self):
         delta_x_1 = int(self.carWidth*np.cos(np.deg2rad(self.angle))/2)

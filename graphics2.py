@@ -33,7 +33,9 @@ def main():
     rect = car.Car(screen, 300, 300, 300, 200) 
     rect.rotate(0)
     
-        
+    # num sensor
+    num_sensor = len(rect.sensors)
+
     done = False
     count = 0
     screen.fill(BG_COLOR)
@@ -83,33 +85,28 @@ def main():
 
         obs_lst = [obs_1, obs_2, obs_3, obs_4, obs_5, obs_6]
 
-#        print(rect.xpos, ",  ", rect.ypos)
 
-       
-        # Checking for collisions
+        # Display the min_max corner of the car 
         for corner in rect.get_min_max():
-            pg.draw.circle(screen, blue, corner , 5)
+            pg.draw.circle(screen, yellow, corner, 3)
+        
+        sensor_detect = [False for i in range(num_sensor)]
 
+        # Checking for collisions
         for obs in obs_lst:
-            if obs.in_wall_rectangle(rect.get_min_max()):
-                rect.reset() 
-
-        # pg.draw.circle(screen, (255, 0, 0), rect.get_origin(), 5)
-
-        for sen in rect.sensors:
-            point = sen.get_min_max()
-            end_pt = sen.get_end()
-            min_max_pt = sen.get_min_max()
-
-            # pg.draw.circle(screen, (255, 0, 255, 0), point[1], 5)
-#            for obs in obs_lst: 
-#                color = (255, 0, 0) if obs.in_wall(point) else (255, 255, 0)
-#                pg.draw.circle(screen,  color, point, 5)
-
-            check_lst = [obs.in_wall_line(min_max_pt) for obs in obs_lst]
             
-            color = red if (True in check_lst) else yellow
-            pg.draw.circle(screen, color, end_pt, 5)
+            # Car collision
+            if obs.in_wall_rectangle(rect.get_min_max()):
+                rect.reset()
+            
+            # Sensor detection
+            sensor_detect = obs.in_wall_sensors(sensor_detect, rect.sensors)
+        
+        # update sensors     
+        for i, sen in enumerate(rect.sensors):
+            sen.detect = sensor_detect[i]
+            #color = red if sen.detect else yellow
+            #pg.draw.circle(screen, color, sen.get_end(), 3)
 
         # 3. copy/redraw the rectangle
         rect.update()

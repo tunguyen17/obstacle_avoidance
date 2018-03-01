@@ -20,7 +20,7 @@ class Wall():
         return True if (check_x and check_y) else False
 
     
-    def in_wall_min_max(self, min_max):
+    def in_wall_rectangle(self, min_max):
         min_pt = min_max[0]
         max_pt = min_max[1]
 
@@ -30,11 +30,25 @@ class Wall():
         return (min_check or max_check)
 
 
-    def in_wall_min_max2(self, min_max):
+    def in_wall_line(self, min_max):
         min_pt = min_max[0]
         max_pt = min_max[1]
+        
+        check_X = False if (max_pt[0] < self.min_pt[0]) or (self.max_pt[0] < min_pt[0]) else True
+        check_Y = False if (max_pt[1] < self.min_pt[1]) or (self.max_pt[1] < min_pt[1]) else True
 
-        min_check = self.in_wall(min_pt)
-        max_check = self.in_wall(max_pt)
+        return (check_X and check_Y)
 
-        return (min_check or  max_check)
+    def in_wall_sensors(self, sensor_detect, sensor_lst):
+        for i, sensor in enumerate(sensor_lst):
+            if not sensor_detect[i]:
+                # If sensor has not detect any thing
+                min_pt, max_pt = sensor.get_min_max()  
+            
+                check_X = False if (max_pt[0] < self.min_pt[0]) or (self.max_pt[0] < min_pt[0]) else True
+                check_Y = False if (max_pt[1] < self.min_pt[1]) or (self.max_pt[1] < min_pt[1]) else True
+            
+                sensor_detect[i] = (check_X and check_Y)
+
+        return sensor_detect    
+

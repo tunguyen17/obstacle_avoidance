@@ -60,8 +60,12 @@ class Car(pg.Surface):
         # pg.draw.line(self, (0, 255, 0, 255), (0, 0), (0, height), 10 )
 
     def update(self):
-#        for sen in self.sensors:
-#            sen.update()
+        for sen in self.sensors:
+           color = self.red if sen.detect else self.green
+           pg.draw.line(self, color, sen.start, sen.end, 2)
+        
+        # rotate the image
+        self.image = pg.transform.rotozoom(self, self.angle, 1)
 
         # get the new rect after rotate
         self.rect = self.image.get_rect(center=self.rect.center)
@@ -73,7 +77,7 @@ class Car(pg.Surface):
     def rotate(self, direction):
         # rotate the imange
         self.angle += direction*self.delta
-        self.image = pg.transform.rotozoom(self, self.angle, 1)
+        #self.image = pg.transform.rotozoom(self, self.angle, 1)
 
     
     def move(self, direction):

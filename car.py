@@ -39,8 +39,8 @@ class Car(pg.Surface):
         self.carHeight = 18
     
 
-        center_x =  int((width - self.carWidth)/2)
-        center_y =  int((height - self.carHeight)/2)
+        center_x =  (width - self.carWidth)/2
+        center_y =  (height - self.carHeight)/2
         
         # self.fill((255,0,0))
 
@@ -52,12 +52,12 @@ class Car(pg.Surface):
         # rotate the image to the original position
         self.image = pg.transform.rotozoom(self, 0, 1)
         
-        sensor1 = sensor.Sensor(self, (center_x + self.carWidth, int(height/2)), 0, self.green) 
-        sensor2 = sensor.Sensor(self, (center_x + self.carWidth, int(height/2) + 10), -30, self.green) 
-        sensor3 = sensor.Sensor(self, (center_x + self.carWidth, int(height/2) - 10), 30, self.green)
+        sensor1 = sensor.Sensor(self, (center_x + self.carWidth, height/2), 0, self.green) 
+        sensor2 = sensor.Sensor(self, (center_x + self.carWidth, height/2 + 10), -30, self.green) 
+        sensor3 = sensor.Sensor(self, (center_x + self.carWidth, height/2 - 10), 30, self.green)
         
-        sensor4 = sensor.Sensor(self, (int(0.51*width), center_y + self.carHeight), -80, self.green) 
-        sensor5 = sensor.Sensor(self, (int(0.51*width), center_y ), 80, self.green) 
+        sensor4 = sensor.Sensor(self, (0.51*width, center_y + self.carHeight), -80, self.green) 
+        sensor5 = sensor.Sensor(self, (0.51*width, center_y ), 80, self.green) 
 
         self.sensors = [sensor1, sensor2, sensor3, sensor4, sensor5] 
 
@@ -105,14 +105,14 @@ class Car(pg.Surface):
         self.rect.center = (self.xpos, self.ypos)
 
     def get_corners(self):
-        delta_x_1 = int(self.carWidth*np.cos(np.deg2rad(self.angle))/2)
-        delta_x_2 = int(self.carHeight*np.sin(np.deg2rad(self.angle))/2)
+        delta_x_1 = self.carWidth*np.cos(np.deg2rad(self.angle))/2
+        delta_x_2 = self.carHeight*np.sin(np.deg2rad(self.angle))/2
 
-        delta_y_1 = int(self.carWidth*np.sin(np.deg2rad(self.angle))/2)
-        delta_y_2 = int(self.carHeight*np.cos(np.deg2rad(self.angle))/2)
+        delta_y_1 = self.carWidth*np.sin(np.deg2rad(self.angle))/2
+        delta_y_2 = self.carHeight*np.cos(np.deg2rad(self.angle))/2
 
-        xpos = int(self.xpos)
-        ypos = int(self.ypos)
+        xpos = self.xpos
+        ypos = self.ypos
 
         A_x = xpos + delta_x_1 + delta_x_2
         A_y = ypos - delta_y_1 + delta_y_2
@@ -128,15 +128,15 @@ class Car(pg.Surface):
 
         return([(A_x, A_y), (B_x, B_y), (C_x, C_y), (D_x, D_y)])
 
-    def get_min_max(self):
-        delta_x_1 = int(self.carWidth*np.cos(np.deg2rad(self.angle))/2)
-        delta_x_2 = int(self.carHeight*np.sin(np.deg2rad(self.angle))/2)
+    def get_min_max(self, round = False):
+        delta_x_1 = self.carWidth*np.cos(np.deg2rad(self.angle))/2
+        delta_x_2 = self.carHeight*np.sin(np.deg2rad(self.angle))/2
 
-        delta_y_1 = int(self.carWidth*np.sin(np.deg2rad(self.angle))/2)
-        delta_y_2 = int(self.carHeight*np.cos(np.deg2rad(self.angle))/2)
+        delta_y_1 = self.carWidth*np.sin(np.deg2rad(self.angle))/2
+        delta_y_2 = self.carHeight*np.cos(np.deg2rad(self.angle))/2
 
-        xpos = int(self.xpos)
-        ypos = int(self.ypos)
+        xpos = self.xpos
+        ypos = self.ypos
 
         A_x = xpos + delta_x_1 + delta_x_2
         A_y = ypos - delta_y_1 + delta_y_2
@@ -157,23 +157,26 @@ class Car(pg.Surface):
         max_x = max([A_x, B_x, C_x, D_x])
         max_y = max([A_y, B_y, C_y, D_y]) 
         
-        return([(min_x, min_y), (max_x, max_y)])
+        res = [(int(min_x), int(min_y)), (int(max_x), int(max_y))] if round else [(min_x, min_y), (max_x, max_y)]
+
+        return(res)
 
        
-    def get_origin(self):
-        delta_x_1 = int(self.width*np.cos(np.deg2rad(self.angle))/2)
-        delta_x_2 = int(self.height*np.sin(np.deg2rad(self.angle))/2)
+    def get_origin(self, round = False):
+        delta_x_1 = self.width*np.cos(np.deg2rad(self.angle))/2
+        delta_x_2 = self.height*np.sin(np.deg2rad(self.angle))/2
 
-        delta_y_1 = int(self.width*np.sin(np.deg2rad(self.angle))/2)
-        delta_y_2 = int(self.height*np.cos(np.deg2rad(self.angle))/2)
+        delta_y_1 = self.width*np.sin(np.deg2rad(self.angle))/2
+        delta_y_2 = self.height*np.cos(np.deg2rad(self.angle))/2
 
-        xpos = int(self.xpos)
-        ypos = int(self.ypos)
+        xpos = self.xpos
+        ypos = self.ypos
 
         B_x = xpos - delta_x_1 - delta_x_2
         B_y = ypos + delta_y_1 - delta_y_2
-
-        return((B_x, B_y))
+        
+        res = (int(B_x), int(B_y)) if round else (B_x, B_y)
+        return(res)
 
 
 

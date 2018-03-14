@@ -15,7 +15,20 @@ class Wall():
         self.min_pt = (pos[0], pos[1])
         self.max_pt = (pos[0] + pos[2], pos[1] + pos[3])
         # pg.draw.rect(parent, color, pos)
-    
+        
+        point1 = self.min_pt
+        point2 = (self.max_pt[0], self.min_pt[1])
+        point3 = self.max_pt
+        point4 = (self.min_pt[0], self.max_pt[1])
+        
+        self.corners = [point1, point2, point3, point4]
+        self.sides = [[self.corners[0], self.corners[1]],\
+                    [self.corners[1], self.corners[2]],\
+                    [self.corners[3], self.corners[2]],\
+                    [self.corners[0], self.corners[3]]]
+
+        self.sides_lines = [Fun.get_equation(points) for points in self.sides]
+        
     def draw(self):
         pg.draw.rect(self.parent, self.color, self.pos)
 
@@ -33,10 +46,14 @@ class Wall():
         min_pt = min_max[0]
         max_pt = min_max[1]
 
-        min_check = self.in_wall(min_pt)
-        max_check = self.in_wall(max_pt)
+        #min_check = self.in_wall(min_pt)
+        #max_check = self.in_wall(max_pt)
+        
+        check_x = max_pt[0] <= self.pos[0] or min_pt[0] >= self.pos[0] + self.pos[2]
+        check_y = max_pt[1] <= self.pos[1] or min_pt[1] >= self.pos[1] + self.pos[3]
 
-        return (min_check or max_check)
+
+        return (not check_x and not check_y)
 
 
     def in_wall_line(self, min_max):
@@ -83,13 +100,12 @@ class Wall():
 
         return np.linalg.solve(a, b)
     
-    def in_wall_sensors(self, sensor_detect, sensor_lst):
+    def in_wall_sensors(self, sensor_lst):
         wall_sensor_detect = [False for i in range(len(sensor_lst))]
         check = False
 
         for i, sensor in enumerate(sensor_lst):
-            sensor.equation()
-            if not sensor_detect[i]:
+            if not sensor.detect:
                 # If sensor has not detect any thing
                 min_pt, max_pt = sensor.get_min_max()  
             
@@ -97,53 +113,60 @@ class Wall():
                 check_Y = False if (max_pt[1] < self.min_pt[1]) or (self.max_pt[1] < min_pt[1]) else True
                 
                 check = (check_X and check_Y)
-
-                sensor_detect[i] = check
-                wall_sensor_detect[i] = check
-
-            dist_lst = [Fun.inf for s in range(4)]
+                
+                    
+            #dist_lst = [Fun.inf for s in range(4)]
             
+            # If sensor detect a wall. Find the coordinate
             if check:
-                corners = self.get_corners()
+               # corners = self.get_corners()
+               # 
+               # sides = [[corners[0], corners[1]],\
+               #         [corners[1], corners[2]],\
+               #         [corners[3], corners[2]],\
+               #         [corners[0], corners[3]]]
+
+                sensor_start = sensor.get_start()
+                sensor_end = sensor.get_end()
+
+                sensor_eq = Fun.get_equation([sensor_start, sensor_end]) 
                 
-                sides = [[corners[0], corners[1]],\
-                        [corners[1], corners[2]],\
-                        [corners[3], corners[2]],\
-                        [corners[0], corners[3]]]
+                intersect_lst = []
+                dist_lst = []
 
-                #for p in sides[3]:
-                #    pg.draw.circle(self.parent, (244, 255, 21), p, 3)
+                wall_detected = False
 
-                sides_lines = [Fun.get_equation(points) for points in sides]
-                
-                sensor_eq = Fun.get_equation([sensor.get_start(), sensor.get_end()]) 
-                
-                #print(sensor_eq) 
+                # Find the intersection point
+                for i, l in enumerate(self.sides_lines):
+                    intersect = self.get_cross(l, sensor_eq)
+                    
+                    if Fun.point_between(self.sides[i][0], intersect, self.sides[i][1]) and Fun.point_between(sensor_start, intersect, sensor_end):
+                        dist = Fun.distance([sensor.get_start(), intersect])
 
-                for i, l in enumerate(sides_lines):
+                        if dist < 51:
+                            intersect_lst.append(intersect)
+                            dist_lst.append(dist)
 
-                    try:
-                        intersect = self.get_cross(l, sensor_eq)
-                        
-                        if Fun.point_between(sides[i][0], intersect, sides[i][1]):
-                            dis = Fun.distance([sensor.get_start(), intersect])
-
-                            if dis < 51:
-                               # print(dis)
-                                pg.draw.circle(self.parent, (255, 0, 0), [int(intersect[0]), int(intersect[1])], 3)
-                                dist_lst[i] = dis
+                            wall_detected = True
                             
-                    except Exception as e:
-                        print(e)
+                            #pg.draw.circle(self.parent, (255, 0, 0), [int(intersect[0]), int(intersect[1])], 3)
+                            #dist_lst[i] = dis
 
-            if  min(dist_lst) < 51:
-                sensor.dist = min(dist_lst)
-                sensor.detect = True
-            else:
-                sensor.dist = Fun.inf
-                sensor.detect = False
+                if  wall_detected:
+                    
+                    sensor.dist = min(dist_lst)
+                    
+                    intersect_pt = intersect_lst[dist_lst.index(sensor.dist)]
+
+                    pg.draw.circle(self.parent, (255, 0, 0), Fun.round_lst(intersect_pt), 3)
+                    
+                    sensor.detect = True
+
+                    # Indicate if the wall is detected by any sensor
+                    wall_sensor_detect[i] = check
+
            
+        # Change the color when the wall is detected by a sensor
         self.color = self.yellow if True in wall_sensor_detect else self.blue
 
-        return sensor_detect    
 

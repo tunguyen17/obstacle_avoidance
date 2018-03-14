@@ -24,7 +24,7 @@ class Sensor():
 #        self.endPoint = (int(tempX), int(tempY))
 #
         self.color = self.green
-        self.dis = Fun.inf
+        self.dist = Fun.inf
         self.detect = False 
         
 #        pg.draw.line(self.car, self.color, self.start, self.end, 2) 
@@ -74,6 +74,7 @@ class Sensor():
 
     def update(self):
         self.color = self.red if self.detect else self.green
+        
         pg.draw.line(self.car, self.color, self.start, self.end, 2) 
 
 

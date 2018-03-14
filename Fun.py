@@ -1,11 +1,11 @@
 import numpy as np
 
-inf = 10e10
+inf = 1000
 
-def point_between(p1, p2, p3):
+def point_between(p1, p2, p3, tol = 3):
 
     lst = zip(p1, p2, p3)
-    check = [i[0] <= i[1] <= i[2] or i[0] >= i[1] >= i[2] for i in lst]
+    check = [i[0]-tol <= i[1] <= i[2]+tol or i[0]+tol >= i[1] >= i[2]-tol for i in lst]
 
     res = False if False in check else True
     return res
@@ -37,3 +37,15 @@ def distance(points):
     # print(np.sqrt(sum(delta)))
 
     return np.sqrt(sum(delta))
+
+def round_lst(lst):
+    return [int(i) for i in lst]
+
+def scale(x, a = 0, b = 1):
+    m = 0
+    r = inf - m
+
+    if r == 0:
+        r = 1
+    y = (x-m)/ r * (b - a) + a
+    return y

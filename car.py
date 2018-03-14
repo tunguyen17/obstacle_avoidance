@@ -3,7 +3,7 @@ import numpy as np
 import sensor 
 
 class Car(pg.Surface):
-    def __init__(self, parent, xpos, ypos, width, height, angle = 1, delta = 18, step = 5):
+    def __init__(self, parent, xpos, ypos, width, height, angle = 1, delta = 10, step = 3):
         '''
             parent = screen
         '''
@@ -52,11 +52,10 @@ class Car(pg.Surface):
         # rotate the image to the original position
         self.image = pg.transform.rotozoom(self, 0, 1)
         
-        sensor1 = sensor.Sensor(self, (center_x + self.carWidth, height/2), 0, self.green) 
+        sensor1 = sensor.Sensor(self, (0.51*width, center_y + self.carHeight), -80, self.green) 
         sensor2 = sensor.Sensor(self, (center_x + self.carWidth, height/2 + 10), -30, self.green) 
-        sensor3 = sensor.Sensor(self, (center_x + self.carWidth, height/2 - 10), 30, self.green)
-        
-        sensor4 = sensor.Sensor(self, (0.51*width, center_y + self.carHeight), -80, self.green) 
+        sensor3 = sensor.Sensor(self, (center_x + self.carWidth, height/2), 0, self.green) 
+        sensor4 = sensor.Sensor(self, (center_x + self.carWidth, height/2 - 10), 30, self.green)
         sensor5 = sensor.Sensor(self, (0.51*width, center_y ), 80, self.green) 
 
         self.sensors = [sensor1, sensor2, sensor3, sensor4, sensor5] 

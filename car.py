@@ -3,7 +3,7 @@ import numpy as np
 import sensor 
 
 class Car(pg.Surface):
-    def __init__(self, parent, xpos, ypos, width, height, angle = 1, delta = 10, step = 3):
+    def __init__(self, parent, xpos, ypos, width, height, angle = 1, delta = 10, step = 4):
         '''
             parent = screen
         '''

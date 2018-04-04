@@ -1,6 +1,6 @@
 import numpy as np
 
-inf = 1000
+inf = 100
 
 def point_between(p1, p2, p3, tol = 3):
 

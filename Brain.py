@@ -3,13 +3,13 @@ from keras.layers import Dense
 import numpy as np
 
 class Brain():
-    def __init__(self, buffer_size, p = 0.2, alpha = 0.3):
+    def __init__(self, buffer_size, p = 0.8, gamma = 0.9, input_shape = 6):
         
         # Initialize learning model
         self.model = Sequential()
 
         # Hidden Layer 1
-        self.model.add(Dense(10, activation = 'sigmoid', input_shape = (6,), kernel_initializer = 'random_uniform', bias_initializer = 'Zeros'))
+        self.model.add(Dense(10, activation = 'sigmoid', input_shape = (input_shape,), kernel_initializer = 'random_uniform', bias_initializer = 'Zeros'))
         # Hidden Layer 2
         self.model.add(Dense(5, activation = 'sigmoid', kernel_initializer = 'random_uniform', bias_initializer = 'Zeros'))
         # Output
@@ -21,7 +21,7 @@ class Brain():
         self.buffer_size = buffer_size
         self.learning_size = int(buffer_size*p)
         self.p = p
-        self.alpha = alpha
+        self.gamma = gamma
 
         # Initialize buffer
         tmp_mem = [ [0.0]*5, 0, 0.0, [0.0]*5, 0  ]
@@ -41,37 +41,38 @@ class Brain():
         for i,v in enumerate(self.buffer):
             print(i, ". ", v)
             
-    def predict_a(self, s0a0):
-        feature = np.array(s0a0)[np.newaxis, :]
+    def predict_a(self, s):
+        feature = np.array(s)[np.newaxis, :]
         predict = self.model.predict(feature)
 
         return predict.argmax()
     
-    def create_input(data):
-        return data[0] + [data[1]]
+    def create_input(data, i = 0):
+        return data[0] 
 
     def train(self):
         idx = np.random.randint(self.buffer_size, size = self.learning_size)
 
         train = self.buffer[idx]
         
-        s0a0 = np.apply_along_axis(Brain.create_input, 1, train[:,:2])
+        s0 = np.apply_along_axis(lambda x: x[0], 1, train)
         
         r = train[:,2]
 
-        s1a1 = np.apply_along_axis(Brain.create_input, 1, train[:,3:])
+        s1 = np.apply_along_axis(lambda x: x[3], 1, train)
         
-        pred1 = self.model.predict(s1a1)
+        oldQ = self.model.predict(s0)
+        newQ = self.model.predict(s1)
         
-        target = pred1.copy()
+        target = oldQ.copy()
 
         for i, v in enumerate(r):
-            a0 = int(s0a0[i][-1])
-            a1 = int(s1a1[i][-1])
+            a0 = int(train[i][1])
+            a1 = int(train[i][-1])
             if v <= - 500:
                 target[i][a0] = v 
             else:
-                target[i][a0] = v + self.alpha*pred1[i][a1]
+                target[i][a0] = v + self.gamma*newQ[i][a1]
 
         
-        self.model.fit(s0a0, target, epochs=5, verbose=0)
+        self.model.fit(s0, target, epochs=10, verbose=0)

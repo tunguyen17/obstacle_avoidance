@@ -11,35 +11,12 @@ from pygame.locals import *
 import numpy as np
 
 # import for learning
-from keras.models import Sequential
-from keras.layers import Dense
-
+import Brain as br
 
 def main():
     
-#    # Initialize the learning model
-    model = Sequential()
-
-    # Input layer has shape of 6
-    ## 5 from sensors - state
-    ## 1 from action - action
-    
-    # Hidden Layer 1
-    model.add(Dense(70, activation = 'sigmoid', input_shape=(6,), kernel_initializer='random_uniform', bias_initializer = 'Zeros'))
-    # Hidden Layer 2
-    model.add(Dense(50, activation = 'sigmoid', kernel_initializer='random_uniform', bias_initializer = 'Zeros')) 
-
-    model.add(Dense(30, activation = 'sigmoid', kernel_initializer='random_uniform', bias_initializer = 'Zeros')) #
-
-    model.add(Dense(15, activation = 'sigmoid', kernel_initializer='random_uniform', bias_initializer = 'Zeros')) 
-
-    model.add(Dense(10, activation = 'sigmoid', kernel_initializer='random_uniform', bias_initializer = 'Zeros')) 
-
-   # Output    
-#    model.add(Dense(3, activation = 'linear', kernel_initializer='random_uniform', bias_initializer = 'Zeros'))
-    
-    model.compile(optimizer = 'rmsprop', loss = 'mse')
-
+    # Initialize the learning model
+    brain = br.Brain(80, input_shape = 5)
 
     # Initialize graphics stuff
     clock = pg.time.Clock()
@@ -86,15 +63,13 @@ def main():
     # Initialize learning data
     action_lst = [lambda : rect.rotate(1), lambda : None, lambda : rect.rotate(-1)]
     action_lst_scaled = [0, 0.5, 1]
- 
 
     # Scalling the input
     sensor_scaled = [Fun.scale(Fun.inf) for v in rect.sensors]
     
     # state
-    state = sensor_scaled
-    s0 = np.array(state)
-    s1 = s0.copy()
+    s0 = sensor_scaled[:]
+    s1 = s0[:]
 
     # action | 0 - Left | 1 - Straight | 2 - Right 
     a0 = 1
@@ -106,9 +81,6 @@ def main():
 
     crashed = False
     
-    # initialize buffer 
-    buffer = []
-    buffer_size = 10
 
     # Simulation loop
     while not done:
@@ -160,11 +132,15 @@ def main():
 
             # Car not collide
             else: 
-                reward = 10  # car still alive
-                #if a0 == 1: reward=500
+                reward = 0  # car still alive
+                if a0 == 1: reward= 20
 
             # Sensor detection
             obs.in_wall_sensors(rect.sensors)
+
+
+        # reward | r_t
+        r0 = reward
        
         # Scalling the sensor data
         sensor_scaled = [Fun.scale(v.dist) for v in rect.sensors]
@@ -172,57 +148,27 @@ def main():
         # action | a_t
         ## save the previous action
         a0 = a1
-
-        ## random action
-        if rnd.random() < 0.2:
-            a1 = rnd.randint(0, 2) 
-        ## a1 = action choosen by nn
-        else:
-            # Copy the old prediction
-            try:
-                pred0 = pred1.copy()
-            except:
-                pass
             
-            s0a0 = np.array(s0 + [a0])[np.newaxis, :]
-#            pred1 = model.predict(s0a0)
-            
-            print(s0a0)
-
-#            a1 = pred1.argmax()
-            
-        # Collect data
-
-        # state | s_t
-        
-        # state = sensor_scaled
-
         # copy old state
         s0 = s1[:]
         ## get current state
         s1 = sensor_scaled 
     
-        
-        # reward | r_t
-        r0 = reward
-            
-        #######################
-        memory = (s0, a0, r0, s1, a1)
-    
-        if len(buffer) <= buffer_size:
-            # append memory to buffer
-            buffer.append(memory)
+
+        ## random action
+        if rnd.random() < 0.1:
+            a1 = rnd.randint(0, 2) 
+        ## a1 = action choosen by nn
         else:
-            # replace one of the entry
-            buffer[rnd.randint(0, buffer_size - 1)] = memory
-            
-            # learning here
+            a1 = brain.predict_a(s1)
+           
+        #######################
+        memory = [s0, a0, r0, s1, a1]
+    
+        brain.add_memory(memory)
+        
+        brain.train()
 
-
-#            for row in buffer:
-#                print(row)
-            
-#            print("\n ----------------  \n")
 
         # reset s1 if crashed
         if crashed:

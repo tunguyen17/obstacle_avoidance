@@ -16,7 +16,7 @@ import Brain as br
 def main():
     
     # Initialize the learning model
-    brain = br.Brain(10)
+    brain = br.Brain(500)
 
     # Initialize graphics stuff
     clock = pg.time.Clock()
@@ -84,7 +84,7 @@ def main():
     
     # initialize buffer 
     buffer = []
-    buffer_size = 10
+    buffer_size = 3
 
     # Simulation loop
     while not done:
@@ -136,11 +136,15 @@ def main():
 
             # Car not collide
             else: 
-                reward = 10  # car still alive
-                #if a0 == 1: reward=500
+                reward = 0  # car still alive
+                if a0 == 1: reward= 20
 
             # Sensor detection
             obs.in_wall_sensors(rect.sensors)
+
+
+        # reward | r_t
+        r0 = reward
        
         # Scalling the sensor data
         sensor_scaled = [Fun.scale(v.dist) for v in rect.sensors]
@@ -148,6 +152,12 @@ def main():
         # action | a_t
         ## save the previous action
         a0 = a1
+            
+        # copy old state
+        s0 = s1[:]
+        ## get current state
+        s1 = sensor_scaled 
+    
 
         ## random action
         if rnd.random() < 0.1:
@@ -156,36 +166,14 @@ def main():
         else:
             s0a0 = np.array(s0 + [a0])
             a1 = brain.predict_a(s0a0)
-            
-        # Collect data
-
-        # state | s_t
-        
-        # state = sensor_scaled
-
-        # copy old state
-        s0 = s1[:]
-        ## get current state
-        s1 = sensor_scaled 
-    
-        
-        # reward | r_t
-        r0 = reward
-            
+           
         #######################
-        memory = (s0, a0, r0, s1, a1)
+        memory = [s0, a0, r0, s1, a1]
     
-        if len(buffer) <= buffer_size:
-            # append memory to buffer
-            buffer.append(memory)
-        else:
-            # replace one of the entry
-            buffer[rnd.randint(0, buffer_size - 1)] = memory
-            
-            # pick a random subset of int
-            idx = np.random.randint(buffer_size, size = int(buffer_size*0.2))
-            # learning here
-            data = np.array(buffer)[idx, :]
+        brain.add_memory(memory)
+        
+        brain.train()
+
 
 #            for row in data:
 #                print(row)

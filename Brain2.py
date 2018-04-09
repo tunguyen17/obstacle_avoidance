@@ -9,11 +9,11 @@ class Brain():
         self.model = Sequential()
 
         # Hidden Layer 1
-        self.model.add(Dense(30, activation = 'sigmoid', input_shape = (input_shape,), kernel_initializer = 'random_uniform', bias_initializer = 'Zeros'))
+        self.model.add(Dense(30, activation = 'sigmoid', input_shape = (input_shape,), kernel_initializer = 'lecun_uniform')) #, bias_initializer = 'Zeros'))
         # Hidden Layer 2
-        self.model.add(Dense(10, activation = 'sigmoid', kernel_initializer = 'random_uniform', bias_initializer = 'Zeros'))
+        self.model.add(Dense(10, activation = 'sigmoid', kernel_initializer = 'lecun_uniform')) #, bias_initializer = 'Zeros'))
         # Output
-        self.model.add(Dense(3, activation = 'linear', kernel_initializer = 'random_uniform', bias_initializer = 'Zeros'))
+        self.model.add(Dense(3, activation = 'linear', kernel_initializer = 'lecun_uniform')) #, bias_initializer = 'Zeros'))
         # Compile model
         self.model.compile(optimizer = 'rmsprop', loss = 'mse')
 
@@ -24,7 +24,7 @@ class Brain():
         self.gamma = gamma
 
         # Initialize buffer
-        tmp_mem = [ [0.0]*5, 0, 0.0, [0.0]*5, 0  ]
+        tmp_mem = [ [0.0]*5, 0, 0.0, [0.0]*5]
         self.buffer = np.array([tmp_mem]*buffer_size)
         self.buffer_head = 0
         
@@ -68,11 +68,15 @@ class Brain():
 
         for i, v in enumerate(r):
             a0 = int(train[i][1])
-            a1 = int(train[i][-1])
             if v <= - 500:
                 target[i][a0] = v 
             else:
-                target[i][a0] = v + self.gamma*newQ[i][a1]
+                target[i][a0] = v + self.gamma*max(newQ[i])
 
         
         self.model.fit(s0, target, epochs=10, verbose=0)
+
+    def save(self, age):
+        filename = 'saved-model-age-'+ str(age) + '.h5'  
+        self.model.save_weights("weights/" + filename, overwrite = True)
+        print(filename)

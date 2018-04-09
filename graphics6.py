@@ -11,7 +11,7 @@ from pygame.locals import *
 import numpy as np
 
 # import for learning
-import Brain as br
+import Brain2 as br
 
 def main():
     
@@ -81,14 +81,31 @@ def main():
 
     crashed = False
     
+    loop = 0
+    # alpha for choosing random action
+    p_alpha = 0.8
+    
+    age = 0
+    best_age = 0
 
     # Simulation loop
     while not done:
-        
+
+        # Increment iteration
+        loop += 1  
+        age += 1
+
+        # decrease p_alpha every 100 steps
+        if loop > 1000:
+            p_alpha *= 0.9
+            loop = 0
+            print('New alpha', p_alpha)
+
         # condition to exit
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 done = True
+                
             
             # Manual action 
             if event.type == pg.KEYDOWN:
@@ -100,8 +117,9 @@ def main():
                     rect.move(1)
                     pass
                 if event.key == pg.K_DOWN:
-                    rect.move(-1)
-        
+                    #rect.move(-1)
+                    brain.save('keysave')
+
         # repaint background
         screen.fill(BG_COLOR)
 
@@ -110,16 +128,33 @@ def main():
             obs.draw()
         
         # 1. start 
-
-        # carry out the action choosen by nn
-        action_lst[a1]() 
-        rect.move(1)
         
-        # Initialize sensors data
+        ## get s0
+        # s.1 Initialize sensors data
         for sen in rect.sensors:
             sen.dist = Fun.inf
             sen.detect = False
+        
+        # s.2 get sensor reading
+        for obs in obs_lst:
+            obs.in_wall_sensors(rect.sensors)
 
+        # s.3 save the sensor data
+        s0 = [Fun.scale(v.dist) for v in rect.sensors]
+        
+
+        ## get a0
+        if rnd.random() < p_alpha:
+            a0 = rnd.randint(0, 2) 
+        ## a1 = action choosen by nn
+        else:
+            a0 = brain.predict_a(s0)
+ 
+        # carry out the action choosen by nn
+        action_lst[a0]() 
+        rect.move(1)
+        
+        ## get r
         # Checking for collisions
         for obs in obs_lst:
             # Car collision
@@ -127,7 +162,11 @@ def main():
                 rect.reset()
                 reward = -500 # car crashed 
                 crashed = True
-                print("\n-----------------CRASHED------------------\n")
+                if best_age < age:
+                    best_age = age
+                    brain.save(age)
+                print("\nCRASHED: ", age, "\n")
+                age = 0
                 break
 
             # Car not collide
@@ -135,48 +174,30 @@ def main():
                 reward = 0  # car still alive
                 if a0 == 1: reward= 20
 
-            # Sensor detection
+        # reward | r_t
+        r = reward
+
+        ## get s1
+        # s.1 Initialize sensors data
+        for sen in rect.sensors:
+            sen.dist = Fun.inf
+            sen.detect = False
+        
+        # s.2 get sensor reading
+        for obs in obs_lst:
             obs.in_wall_sensors(rect.sensors)
 
-
-        # reward | r_t
-        r0 = reward
+        # s.3 save the sensor data
+        s1 = [Fun.scale(v.dist) for v in rect.sensors]
        
-        # Scalling the sensor data
-        sensor_scaled = [Fun.scale(v.dist) for v in rect.sensors]
-
-        # action | a_t
-        ## save the previous action
-        a0 = a1
-            
-        # copy old state
-        s0 = s1[:]
-        ## get current state
-        s1 = sensor_scaled 
-    
-
-        ## random action
-        if rnd.random() < 0.1:
-            a1 = rnd.randint(0, 2) 
-        ## a1 = action choosen by nn
-        else:
-            a1 = brain.predict_a(s1)
-           
+          
         #######################
-        memory = [s0, a0, r0, s1, a1]
-    
+        memory = [s0, a0, r, s1]
+        #print(memory)
+
         brain.add_memory(memory)
         
         brain.train()
-
-
-        # reset s1 if crashed
-        if crashed:
-            # reset sensor data
-            sensor_scaled = [Fun.scale(Fun.inf) for v in rect.sensors]
-            s1 = sensor_scaled
-
-            crashed = False
 
         # 3. copy/redraw the rectangle
         rect.update()

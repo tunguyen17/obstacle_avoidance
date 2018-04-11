@@ -50,14 +50,8 @@ def scale(x, a = 0, b = 1):
     y = (x-m)/ r * (b - a) + a
     return y
 
-def get_cross(l1, l2):
-    a = np.array([l1[:2], l2[:2]])
-    b = np.array([l1[2], l2[2]])
-
-    return np.linalg.solve(a, b)
-
 def r(x):
-    return -50*(x-1)**2 + 50
+    return -(x-1)**2 + 50
 
 def g(x, init = 0.5):
     return (0.9 - init) * (x ** 2 + 1) /  (x ** 2 + 10**7) + init

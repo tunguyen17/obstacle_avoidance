@@ -3,13 +3,13 @@ from keras.layers import Dense
 import numpy as np
 
 class Brain():
-    def __init__(self, buffer_size, p = 0.8, gamma = 0.9, input_shape = 6):
+    def __init__(self, buffer_size, p = 1, input_shape = 6):
         
         # Initialize learning model
         self.model = Sequential()
 
         # Hidden Layer 1
-        self.model.add(Dense(30, activation = 'sigmoid', input_shape = (input_shape,), kernel_initializer = 'lecun_uniform')) #, bias_initializer = 'Zeros'))
+        self.model.add(Dense(20, activation = 'sigmoid', input_shape = (input_shape,), kernel_initializer = 'lecun_uniform')) #, bias_initializer = 'Zeros'))
         # Hidden Layer 2
         self.model.add(Dense(10, activation = 'sigmoid', kernel_initializer = 'lecun_uniform')) #, bias_initializer = 'Zeros'))
         # Output
@@ -21,7 +21,6 @@ class Brain():
         self.buffer_size = buffer_size
         self.learning_size = int(buffer_size*p)
         self.p = p
-        self.gamma = gamma
 
         # Initialize buffer
         tmp_mem = [ [0.0]*5, 0, 0.0, [0.0]*5]
@@ -50,7 +49,7 @@ class Brain():
     def create_input(data, i = 0):
         return data[0] 
 
-    def train(self):
+    def train(self, gamma = 0.9):
         idx = np.random.randint(self.buffer_size, size = self.learning_size)
 
         train = self.buffer[idx]
@@ -71,12 +70,16 @@ class Brain():
             if v <= - 500:
                 target[i][a0] = v 
             else:
-                target[i][a0] = v + self.gamma*max(newQ[i])
+                target[i][a0] = v + gamma*max(newQ[i])
 
         
         self.model.fit(s0, target, epochs=10, verbose=0)
-
+    
     def save(self, age):
         filename = 'saved-model-age-'+ str(age) + '.h5'  
         self.model.save_weights("weights/" + filename, overwrite = True)
         print(filename)
+
+    def load(self, weights_path = 'weights/saved-model-age-2751.h5'):
+        print("model loaded ", weights_path)
+        self.model.load_weights(weights_path)

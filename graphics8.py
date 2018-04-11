@@ -60,10 +60,7 @@ def main():
         
     obs_5 = wall.Wall(screen,  blue, (130, 140, 850, 550))
 
-    obs_6 = wall.Wall(screen,  blue, (500, 0, 600, 50))
-
-    obs_lst = [obs_1, obs_2, obs_3, obs_4, obs_5, obs_6]
-    obs_5 = wall.Wall(screen,  blue, (130, 140, 850, 550))
+    obs_lst = [obs_1, obs_2, obs_3, obs_4, obs_5]
     
     # Initialize learning data
     action_lst = [lambda : rect.rotate(1), lambda : None, lambda : rect.rotate(-1)]

@@ -15,10 +15,16 @@ import Brain2 as br
 
 def main():
     
+    train = False
+
+    # Frame per second
+    fps = 60
+
     # Initialize the learning model
-    brain = br.Brain(100, input_shape = 5)
+    brain = br.Brain(50, input_shape = 5)
     
-    #brain.load()
+    if not train:
+        brain.load('weights/saved-model-age-keysave.h5')
 
     # Initialize graphics stuff
     clock = pg.time.Clock()
@@ -58,12 +64,12 @@ def main():
     obs_3 = wall.Wall(screen,  blue, (max_x-10, 0, max_x, max_y))
     obs_4 = wall.Wall(screen,  blue, (0, max_y-10, max_x, max_y))
         
-    obs_5 = wall.Wall(screen,  blue, (130, 140, 850, 550))
+    obs_5 = wall.Wall(screen,  blue, [330, 140, 200, 60])
+    obs_6 = wall.Wall(screen,  blue, [600, 600, 200, 60])
 
-    obs_6 = wall.Wall(screen,  blue, (500, 0, 600, 50))
+    obs_7 = wall.Wall(screen,  blue, [200, 300, 650, 150])
 
-    obs_lst = [obs_1, obs_2, obs_3, obs_4, obs_5, obs_6]
-    obs_5 = wall.Wall(screen,  blue, (130, 140, 850, 550))
+    obs_lst = [obs_1, obs_2, obs_3, obs_4, obs_5, obs_6, obs_7]
     
     # Initialize learning data
     action_lst = [lambda : rect.rotate(1), lambda : None, lambda : rect.rotate(-1)]
@@ -86,14 +92,22 @@ def main():
 
     loop = 0
     # alpha for choosing random action
-    p_alpha = 0.8
+    p_alpha = 1 if train else 0.001
     
     age = 0
     best_age = 0
 
     # Simulation loop
     while not done:
+        
+        if loop % 2 == 0:
+            obs_x = int(5*np.cos(loop/200))
+            obs_y = int(2*np.sin(loop/50))
 
+            obs_5.move(obs_x, -obs_y)
+        
+            obs_6.move(-obs_x, obs_y)
+            
         # Increment iteration
         loop += 1  
         age += 1
@@ -112,14 +126,15 @@ def main():
             # Manual action 
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_LEFT:
-                   rect.rotate(1)
+                   fps = 30
+                   print("fps: ", fps)
                 if event.key == pg.K_RIGHT:
-                    rect.rotate(-1)
+                   fps = 60
+                   print("fps: ", fps)
                 if event.key == pg.K_UP:
-                    rect.move(1)
-                    pass
+                    train = not train
+                    print('Trainning ', train)
                 if event.key == pg.K_DOWN:
-                    #rect.move(-1)
                     brain.save('keysave')
 
         # repaint background
@@ -197,7 +212,9 @@ def main():
 
         brain.add_memory(memory)
         
-        brain.train(gamma = Fun.g(loop))
+        
+        if train:
+            brain.train(gamma = Fun.g(loop))
 
         # 3. copy/redraw the rectangle
         rect.update()
@@ -205,8 +222,7 @@ def main():
 
         # Update display
         pg.display.flip()
-        
-        clock.tick(65)
+        clock.tick(fps)
 
 if __name__ == "__main__":
     main()

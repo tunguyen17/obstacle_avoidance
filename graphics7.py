@@ -24,7 +24,7 @@ def main():
     brain = br.Brain(50, input_shape = 5)
     
     if not train:
-        brain.load('weights/saved-model-age-keysave.h5')
+        brain.load('good model/saved-model-20-10.h5')
 
     # Initialize graphics stuff
     clock = pg.time.Clock()
@@ -67,7 +67,7 @@ def main():
     obs_5 = wall.Wall(screen,  blue, [330, 140, 200, 60])
     obs_6 = wall.Wall(screen,  blue, [600, 600, 200, 60])
 
-    obs_7 = wall.Wall(screen,  blue, [200, 300, 650, 150])
+    obs_7 = wall.Wall(screen,  blue, [250, 300, 650, 150])
 
     obs_lst = [obs_1, obs_2, obs_3, obs_4, obs_5, obs_6, obs_7]
     
@@ -108,6 +108,8 @@ def main():
         
             obs_6.move(-obs_x, obs_y)
             
+            obs_7.move(-3*obs_y, 0)
+
         # Increment iteration
         loop += 1  
         age += 1

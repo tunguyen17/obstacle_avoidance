@@ -90,6 +90,9 @@ def main():
     
     age = 0
     best_age = 0
+    
+    age_data = open("data/loop.txt", 'w')
+
 
     # Simulation loop
     while not done:
@@ -106,8 +109,10 @@ def main():
         # condition to exit
         for event in pg.event.get():
             if event.type == pg.QUIT:
+                age_data.close()
+                brain.close_data()
                 done = True
-                
+                                                
             
             # Manual action 
             if event.type == pg.KEYDOWN:
@@ -167,6 +172,7 @@ def main():
                     best_age = age
                     brain.save(age)
                 print("\nCRASHED: ", age, "\n")
+                age_data.write(str(age) + '\t')
                 age = 0
                 break
 

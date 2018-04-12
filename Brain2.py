@@ -26,7 +26,8 @@ class Brain():
         tmp_mem = [ [0.0]*5, 0, 0.0, [0.0]*5]
         self.buffer = np.array([tmp_mem]*buffer_size)
         self.buffer_head = 0
-        
+
+        self.brain_data = open("data/brain_data", 'w')
     
     def add_memory(self, memory):
         if self.buffer_head < self.buffer_size:
@@ -73,8 +74,10 @@ class Brain():
                 target[i][a0] = v + gamma*max(newQ[i])
 
         
-        self.model.fit(s0, target, epochs=10, verbose=0)
+        history = self.model.fit(s0, target, epochs=10, verbose=0)
     
+        self.brain_data.write('\t'.join( [str(i) for i in history.history['loss']] ) + '\t')
+
     def save(self, age):
         filename = 'saved-model-age-'+ str(age) + '.h5'  
         self.model.save_weights("weights/" + filename, overwrite = True)
@@ -83,3 +86,6 @@ class Brain():
     def load(self, weights_path = 'weights/saved-model-age-2751.h5'):
         print("model loaded ", weights_path)
         self.model.load_weights(weights_path)
+
+    def close_data(self):
+        self.brain_data.close()

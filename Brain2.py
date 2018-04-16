@@ -9,9 +9,9 @@ class Brain():
         self.model = Sequential()
 
         # Hidden Layer 1
-        self.model.add(Dense(20, activation = 'sigmoid', input_shape = (input_shape,), kernel_initializer = 'lecun_uniform')) #, bias_initializer = 'Zeros'))
+        self.model.add(Dense(40, activation = 'sigmoid', input_shape = (input_shape,), kernel_initializer = 'lecun_uniform')) #, bias_initializer = 'Zeros'))
         # Hidden Layer 2
-        self.model.add(Dense(10, activation = 'sigmoid', kernel_initializer = 'lecun_uniform')) #, bias_initializer = 'Zeros'))
+        self.model.add(Dense(20, activation = 'sigmoid', kernel_initializer = 'lecun_uniform')) #, bias_initializer = 'Zeros'))
         # Output
         self.model.add(Dense(3, activation = 'linear', kernel_initializer = 'lecun_uniform')) #, bias_initializer = 'Zeros'))
         # Compile model

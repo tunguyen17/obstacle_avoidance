@@ -16,7 +16,7 @@ import Brain2 as br
 def main():
     
     # Initialize the learning model
-    brain = br.Brain(100, input_shape = 5)
+    brain = br.Brain(200, input_shape = 5)
     
     #brain.load()
 
@@ -58,12 +58,14 @@ def main():
     obs_3 = wall.Wall(screen,  blue, (max_x-10, 0, max_x, max_y))
     obs_4 = wall.Wall(screen,  blue, (0, max_y-10, max_x, max_y))
         
-    obs_5 = wall.Wall(screen,  blue, (130, 140, 850, 550))
+    obs_5 = wall.Wall(screen,  blue, (130, 140, 850, 350))
 
     obs_6 = wall.Wall(screen,  blue, (500, 0, 600, 50))
 
-    obs_lst = [obs_1, obs_2, obs_3, obs_4, obs_5, obs_6]
-    obs_5 = wall.Wall(screen,  blue, (130, 140, 850, 550))
+    obs_7 = wall.Wall(screen,  blue, (350, 490, 630, 190))
+    obs_8 = wall.Wall(screen,  blue, (0, 600, 240, 250))
+
+    obs_lst = [obs_1, obs_2, obs_3, obs_4, obs_5, obs_6, obs_7, obs_8]
     
     # Initialize learning data
     action_lst = [lambda : rect.rotate(1), lambda : None, lambda : rect.rotate(-1)]
@@ -93,6 +95,8 @@ def main():
     
     age_data = open("data/loop.txt", 'w')
 
+    
+    train = True
 
     # Simulation loop
     while not done:
@@ -100,6 +104,10 @@ def main():
         # Increment iteration
         loop += 1  
         age += 1
+        
+        if age > 2000 and train == True:
+            train = False
+            print("Trainning stopped")
 
         # decrease p_alpha every 100 steps
         if loop % 1000 == 0:
@@ -117,9 +125,11 @@ def main():
             # Manual action 
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_LEFT:
-                   rect.rotate(1)
+                    train = False
+                    print("Training stopped")
                 if event.key == pg.K_RIGHT:
-                    rect.rotate(-1)
+                    train = True
+                    print("Training started")
                 if event.key == pg.K_UP:
                     rect.move(1)
                     pass
@@ -203,7 +213,8 @@ def main():
 
         brain.add_memory(memory)
         
-        brain.train(gamma = Fun.g(loop))
+        if train:
+            brain.train(gamma = Fun.g(loop))
 
         # 3. copy/redraw the rectangle
         rect.update()

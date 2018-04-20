@@ -1,6 +1,6 @@
 import pygame as pg
 import numpy as np
-import Fun
+import fun
 
 class Sensor():
     def __init__(self, car, start, angle, color, reach = 60):
@@ -24,7 +24,7 @@ class Sensor():
 #        self.endPoint = (int(tempX), int(tempY))
 #
         self.color = self.green
-        self.dist = Fun.inf
+        self.dist = fun.inf
         self.detect = False 
         
 #        pg.draw.line(self.car, self.color, self.start, self.end, 2) 

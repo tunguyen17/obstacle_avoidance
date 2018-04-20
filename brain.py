@@ -7,7 +7,7 @@ from keras.layers import Dense
 import numpy as np
 
 class Brain():
-    def __init__(self, buffer_size, p = 0.8, input_shape = 6):
+    def __init__(self, buffer_size, p = 0.8, input_shape = 5):
         
         # Initialize learning model
         self.model = Sequential()

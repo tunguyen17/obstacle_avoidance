@@ -16,7 +16,7 @@ import brain as br
 def main():
     
     # Initialize the learning model
-    brain = br.Brain(100, input_shape = 5)
+    brain = br.Brain(buffer_size = 100, p = 0.8,input_shape = 5)
     
     #brain.load()
 
@@ -105,7 +105,8 @@ def main():
         loop += 1  
         age += 1
         
-        if age > 1500 and train == True:
+        #if age > 1500 and train == True:
+        if p_alpha < 0.01 and age > 1500 and train == True:
             train = False
             brain.save('autosave-1500')
             print("Trainning stopped")

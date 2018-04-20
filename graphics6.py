@@ -16,7 +16,7 @@ import Brain2 as br
 def main():
     
     # Initialize the learning model
-    brain = br.Brain(200, input_shape = 5)
+    brain = br.Brain(100, input_shape = 5)
     
     #brain.load()
 
@@ -42,7 +42,7 @@ def main():
     yellow = (255, 255, 0)
 
     # draw rect
-    rect = car.Car(screen, 230, 75, 300, 200) 
+    rect = car.Car(screen, 230, 80, 300, 200) 
     rect.rotate(0)
     
     # num sensor
@@ -58,7 +58,7 @@ def main():
     obs_3 = wall.Wall(screen,  blue, (max_x-10, 0, max_x, max_y))
     obs_4 = wall.Wall(screen,  blue, (0, max_y-10, max_x, max_y))
         
-    obs_5 = wall.Wall(screen,  blue, (130, 140, 850, 350))
+    obs_5 = wall.Wall(screen,  blue, (130, 160, 850, 330))
 
     obs_6 = wall.Wall(screen,  blue, (500, 0, 600, 50))
 
@@ -105,8 +105,9 @@ def main():
         loop += 1  
         age += 1
         
-        if age > 2000 and train == True:
+        if age > 1500 and train == True:
             train = False
+            brain.save('autosave-1500')
             print("Trainning stopped")
 
         # decrease p_alpha every 100 steps

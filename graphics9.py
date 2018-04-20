@@ -21,7 +21,7 @@ def main():
     fps = 60
 
     # Initialize the learning model
-    brain = br.Brain(100, input_shape = 5)
+    brain = br.Brain(300, input_shape = 5)
     
     if not train:
         brain.load('good model/saved-model-20-10.h5')

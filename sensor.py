@@ -3,7 +3,7 @@ import numpy as np
 import Fun
 
 class Sensor():
-    def __init__(self, car, start, angle, color, reach = 50):
+    def __init__(self, car, start, angle, color, reach = 60):
         
         self.red = (255, 0, 0, 150)
         self.green = (0, 255, 0, 150)

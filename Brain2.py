@@ -1,17 +1,21 @@
+import os
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"   # see issue #152
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
+
 from keras.models import Sequential
 from keras.layers import Dense
 import numpy as np
 
 class Brain():
-    def __init__(self, buffer_size, p = 1, input_shape = 6):
+    def __init__(self, buffer_size, p = 0.8, input_shape = 6):
         
         # Initialize learning model
         self.model = Sequential()
 
         # Hidden Layer 1
-        self.model.add(Dense(40, activation = 'sigmoid', input_shape = (input_shape,), kernel_initializer = 'lecun_uniform')) #, bias_initializer = 'Zeros'))
+        self.model.add(Dense(30, activation = 'sigmoid', input_shape = (input_shape,), kernel_initializer = 'lecun_uniform')) #, bias_initializer = 'Zeros'))
         # Hidden Layer 2
-        self.model.add(Dense(20, activation = 'sigmoid', kernel_initializer = 'lecun_uniform')) #, bias_initializer = 'Zeros'))
+        self.model.add(Dense(30, activation = 'sigmoid', kernel_initializer = 'lecun_uniform')) #, bias_initializer = 'Zeros'))
         # Output
         self.model.add(Dense(3, activation = 'linear', kernel_initializer = 'lecun_uniform')) #, bias_initializer = 'Zeros'))
         # Compile model
@@ -74,7 +78,7 @@ class Brain():
                 target[i][a0] = v + gamma*max(newQ[i])
 
         
-        history = self.model.fit(s0, target, epochs=10, verbose=0)
+        history = self.model.fit(s0, target, epochs=3, verbose=0)
     
         self.brain_data.write('\t'.join( [str(i) for i in history.history['loss']] ) + '\t')
 

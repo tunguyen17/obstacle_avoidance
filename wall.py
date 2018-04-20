@@ -102,7 +102,7 @@ class Wall():
                     if Fun.point_between(self.sides[i][0], intersect, self.sides[i][1]) and Fun.point_between(sensor_start, intersect, sensor_end):
                         dist = Fun.distance([sensor.get_start(), intersect])
 
-                        if dist < 51:
+                        if dist < sensor.reach + 1:
                             intersect_lst.append(intersect)
                             dist_lst.append(dist)
 

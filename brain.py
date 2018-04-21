@@ -31,7 +31,7 @@ class Brain():
         self.buffer = np.array([tmp_mem]*buffer_size)
         self.buffer_head = 0
 
-        self.brain_data = open("data/brain_data", 'w')
+        self.brain_data = open("data/brain_data.txt", 'w')
     
     def add_memory(self, memory):
         if self.buffer_head < self.buffer_size:

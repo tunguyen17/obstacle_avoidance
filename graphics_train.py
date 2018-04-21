@@ -87,8 +87,8 @@ def main():
     r1 = 0
 
     loop = 0
-    # alpha for choosing random action
-    p_alpha = 0.8
+    # epsilon for choosing random action
+    epsilon = 0.8
     
     age = 0
     best_age = 0
@@ -106,19 +106,20 @@ def main():
         age += 1
         
         #if age > 1500 and train == True:
-        if p_alpha < 0.01 and age > 1500 and train == True:
+        if age > 1500 and train == True:
             train = False
             brain.save('autosave-1500')
             print("Trainning stopped")
 
-        # decrease p_alpha every 100 steps
+        # decrease epsilon every 100 steps
         if loop % 1000 == 0:
-            p_alpha *= 0.9
-            print('alpha: ', p_alpha, "\t gamma: ", fun.g(loop))
+            epsilon *= 0.9
+            print('epsilon: ', epsilon, "\t gamma: ", fun.g(loop))
 
         # condition to exit
         for event in pg.event.get():
             if event.type == pg.QUIT:
+                age_data.write(str(age) + '\t')
                 age_data.close()
                 brain.close_data()
                 done = True
@@ -163,7 +164,7 @@ def main():
        
 
         ## get a0
-        if rnd.random() < p_alpha:
+        if rnd.random() < epsilon:
             a0 = rnd.randint(0, 2) 
         ## a1 = action choosen by nn
         else:
